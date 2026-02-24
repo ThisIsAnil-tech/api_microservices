@@ -1,6 +1,6 @@
 function fetchUser() {
   return new Promise(resolve => {
-    setTimeout(() => resolve({ name: "Aneesh", age: 20 }), 2000);
+    setTimeout(() => resolve({ name: "Anil", age: 20 }), 2000);
   });
 }
 
