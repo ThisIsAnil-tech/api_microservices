@@ -1,4 +1,4 @@
-let students = ["Aneesh", "Rahul", "Priya", "Kiran", "Megha"];
+let students = ["Anil", "Rahul", "Priya", "Kiran", "Megha"];
 
 students.push("Ravi");
 students.splice(2, 1);
