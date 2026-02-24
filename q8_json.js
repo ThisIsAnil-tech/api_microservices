@@ -1,4 +1,4 @@
-let user = { name: "Aneesh", age: 20 };
+let user = { name: "Anil", age: 20 };
 
 let jsonString = JSON.stringify(user);
 console.log(jsonString);
