@@ -1,92 +1,72 @@
 const express = require("express");
-const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const cors = require("cors");
 
 const app = express();
-const port = 5000;
-
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-const SECRET_KEY = "mysecretkey";
+const SECRET = "mysecretkey";
 
-let users = [];
-
-const authenticateToken = (req, res, next) => {
-    const token = req.headers["Authorization"];
-    if (!token) {
-        return res.json({ msg: "Access denied" }).status(401);
-    }
-
-    try {
-        const verified = jwt.verify(token, SECRET_KEY);
-        req.user = verified;
-        next();
-    } catch (e) {
-        res.status(400).json({ msg: "Invalid token" });
-    }
-};
-
-app.get("/", (req, res) => {
-    res.send("JWT API is working");
-});
+const users = [];
 
 app.post("/register", async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-        const hp = await bcrypt.hash(password, 10);
+    const { username, password } = req.body;
 
-        const newUser = {
-            id: users.length + 1,
-            name,
-            email,
-            password: hp
-        };
-
-        users.push(newUser);
-        res.json({ msg: "registered" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    const userExists = users.find(u => u.username === username);
+    if (userExists) {
+        return res.status(400).json({ msg: "User already exists" });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    users.push({ username, password: hashedPassword });
+
+    res.json({ msg: "User registered successfully" });
 });
 
 app.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-    const user = users.find(u => u.email === email);
+    const { username, password } = req.body;
 
+    const user = users.find(u => u.username === username);
     if (!user) {
-        return res.status(400).json({ msg: "user not found" });
+        return res.status(400).json({ msg: "User not found" });
     }
 
-    const vp = await bcrypt.compare(password, user.password);
-    if (!vp) {
-        return res.status(400).json({ msg: "Invalid pass" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        return res.status(400).json({ msg: "Wrong password" });
     }
 
-    const token = jwt.sign(
-        { id: user.id, email: user.email },
-        SECRET_KEY,
-        { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ username }, SECRET, { expiresIn: "1h" });
 
     res.json({ token });
 });
 
-app.get("/profile", authenticateToken, (req, res) => {
-    const user = users.find(u => u.id === req.user.id);
+function authMiddleware(req, res, next) {
+    const token = req.headers["authorization"];
 
-    if (!user) {
-        return res.status(404).json({ msg: "user not found" });
+    if (!token) {
+        return res.status(401).json({ msg: "No token provided" });
     }
 
+    try {
+        const decoded = jwt.verify(token.split(" ")[1], SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ msg: "Invalid token" });
+    }
+}
+
+app.get("/dashboard", authMiddleware, (req, res) => {
     res.json({
-        id: user.id,
-        name: user.name,
-        email: user.email
+        msg: "Welcome to dashboard",
+        user: req.user
     });
 });
 
-app.listen(port, () => {
-    console.log("server running");
+app.listen(5000, () => {
+    console.log("Server running on http://localhost:5000");
 });

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>GuardianTour | Smart Safety</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="phone">
+    <!-- Status Bar Mock -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <span>📶 🔋 100%</span>
+    </div>
+
+    <!-- Main Header -->
+    <div class="app-header">
+      <div class="logo">
+        <h1>GuardianTour</h1>
+        <p class="tagline">Edge-AI · Mesh · Blockchain</p>
+      </div>
+      <div class="risk-pill" id="globalRiskBadge">
+        <span>🟡 RISK: MODERATE</span>
+      </div>
+    </div>
+
+    <!-- DYNAMIC SCREENS (Tab Content) -->
+    <div id="dashboardScreen" class="screen active">
+      <!-- live stats cards -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-icon">🎙️</span>
+          <span class="stat-label">Audio AI</span>
+          <span class="stat-value" id="aiStatusText">Active</span>
+          <div class="status-led green"></div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">🌐</span>
+          <span class="stat-label">Connectivity</span>
+          <span class="stat-value" id="connLevelText">Level 1</span>
+          <div class="status-led green" id="connLed"></div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">🕸️</span>
+          <span class="stat-label">Mesh Nodes</span>
+          <span class="stat-value" id="meshCount">0</span>
+          <div class="status-led yellow"></div>
+        </div>
+      </div>
+
+      <!-- map simulation / geofence card -->
+      <div class="card map-card">
+        <div class="card-header">
+          <span>📍 Live Tracking & Geofence</span>
+          <span class="badge" id="zoneBadge">🌿 Safe Zone</span>
+        </div>
+        <div class="map-simulation" id="mapSimulation">
+          <div class="map-placeholder">
+            <div class="map-dot" id="userDot"></div>
+            <div class="geofence-circle" id="geofenceCircle"></div>
+            <div class="trail-path"></div>
+          </div>
+        </div>
+        <div class="map-caption" id="movementStatus">🚶 Normal movement</div>
+      </div>
+
+      <!-- Edge-AI & Anomaly panel -->
+      <div class="card">
+        <div class="card-header">
+          <span>🧠 Edge-AI Monitoring</span>
+          <span class="badge badge-ai">TFLite ready</span>
+        </div>
+        <div class="ai-feed">
+          <div class="audio-wave">
+            <span>🔊 Audio classification:</span>
+            <strong id="audioClassLabel">Ambient noise</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="confidenceFill" style="width: 12%;"></div>
+          </div>
+          <div class="anomaly-row">
+            <span>⚠️ Behavior anomaly:</span>
+            <span id="anomalyText">None detected</span>
+          </div>
+          <button class="btn-outline" id="testScreamBtn">🔊 Test SCREAM (Demo)</button>
+        </div>
+      </div>
+
+      <!-- SOS PANEL & fallback tiers -->
+      <div class="card sos-card">
+        <div class="card-header">
+          <span>🆘 SOS & Multi-Tier Relay</span>
+          <span class="badge" id="sosStateBadge">Standby</span>
+        </div>
+        <div class="sos-tiers">
+          <div class="tier-item" id="tier1">
+            <span>🌐 Level 1 (Internet)</span>
+            <span class="tier-status" id="tier1Status">✅ Active</span>
+          </div>
+          <div class="tier-item" id="tier2">
+            <span>📱 Level 2 (SMS Fallback)</span>
+            <span class="tier-status" id="tier2Status">⚡ Standby</span>
+          </div>
+          <div class="tier-item" id="tier3">
+            <span>🕸️ Level 3 (Mesh Network + A*)</span>
+            <span class="tier-status" id="tier3Status">🔍 Scanning</span>
+          </div>
+        </div>
+        <button class="btn-sos" id="triggerSosBtn">🚨 EMERGENCY SOS (Simulated)</button>
+        <div class="last-sos" id="lastSosMessage">No active SOS</div>
+      </div>
+
+      <!-- Blockchain ID & risk feed -->
+      <div class="card">
+        <div class="card-header">
+          <span>⛓️ Blockchain SSI + Risk Feed</span>
+          <span class="badge">Polygon Testnet</span>
+        </div>
+        <div class="risk-feed">
+          <div class="feed-item">
+            <span>🆔 Digital ID (hashed):</span>
+            <code>0x7c8e...a3f2</code>
+          </div>
+          <div class="feed-item">
+            <span>🌦️ Weather risk:</span>
+            <span id="weatherRisk">Clear skies / low risk</span>
+          </div>
+          <div class="feed-item">
+            <span>📰 Live news alert:</span>
+            <span id="newsAlert">No active alerts</span>
+          </div>
+          <div class="feed-item">
+            <span>⚡ Dynamic risk score:</span>
+            <span id="riskScoreValue" class="risk-score-mid">32 / 100</span>
+          </div>
+        </div>
+        <button class="btn-secondary" id="refreshRiskBtn">🔄 Refresh Risk Context</button>
+      </div>
+    </div>
+
+    <!-- bottom navigation (prototype tabs) -->
+    <div class="bottom-nav">
+      <div class="nav-item active" data-tab="dashboard">
+        <span>🏠</span>
+        <span>Safety Hub</span>
+      </div>
+      <div class="nav-item" data-tab="mesh">
+        <span>🕸️</span>
+        <span>Mesh Net</span>
+      </div>
+      <div class="nav-item" data-tab="identity">
+        <span>🔐</span>
+        <span>Blockchain ID</span>
+      </div>
+    </div>
+
+    <!-- Mesh Network Sim Screen -->
+    <div id="meshScreen" class="screen">
+      <div class="card">
+        <div class="card-header">
+          <span>🕸️ Mesh Networking (A* Routing Simulation)</span>
+          <span class="badge">P2P_CLUSTER</span>
+        </div>
+        <div class="mesh-visual">
+          <div class="node-graph" id="nodeGraph">
+            <!-- dynamic nodes injected via js -->
+          </div>
+          <div class="mesh-stats">
+            <p><strong>🔗 Active Peers:</strong> <span id="activePeersCount">3</span></p>
+            <p><strong>📡 Gateway reachable:</strong> <span id="gatewayStatus">✅ Ranger Station (Internet GW)</span></p>
+            <p><strong>📦 Last relayed packet:</strong> <span id="lastRelay">—</span></p>
+          </div>
+          <button class="btn-outline" id="simulateMeshHopBtn">🔄 Simulate SOS Mesh Relay</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>📡 A* Pathfinding to Gateway</span></div>
+        <div class="pathfinding-demo">
+          <div class="path-row">Node A (You) → Node B → Node C (Gateway)</div>
+          <div class="path-row" id="astarExplanation">✨ Best path: 3 hops, latency ~0.8s</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blockchain Identity Screen -->
+    <div id="identityScreen" class="screen">
+      <div class="card">
+        <div class="card-header"><span>🔐 Self-Sovereign Identity (SSI)</span><span class="badge">Smart Contract</span></div>
+        <div class="identity-detail">
+          <div class="id-row"><span>DID:</span><code>did:polygon:testnet:0x9f3e...b21a</code></div>
+          <div class="id-row"><span>User Hash (PII encrypted):</span><code>0x3a7f...c9d2</code></div>
+          <div class="id-row"><span>Emergency responder role:</span><span id="emergencyAccessBadge">🔒 Locked</span></div>
+          <button class="btn-secondary" id="simulateEmergencyUnlock">🚑 Simulate Responder Decryption</button>
+          <div id="decryptedInfo" class="decrypt-box"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>🌍 Dynamic Risk Scoring (FastAPI mock)</span></div>
+        <div class="risk-trigger">
+          <p>Geofence high-risk zones: Landslide / flash-flood areas trigger high sensitivity AI mode.</p>
+          <button class="btn-outline" id="enterHighRiskZoneBtn">⚠️ Enter 'High Risk Zone' (Demo)</button>
+          <div class="alert-note" id="geoAlert"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

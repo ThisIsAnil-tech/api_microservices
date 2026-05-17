@@ -10,6 +10,7 @@ app.get('/', (req, res) => {
     res.send('API is working');
 });
 
+
 let users = [
     { id: 1, name: 'Alice', email: 'alice@gmail.com' },
     { id: 2, name: 'Marc', email: 'marc@gmail.com' }
@@ -36,6 +37,8 @@ app.post('/user', (req, res) => {
     users.push(newUser);
     res.status(201).json(newUser);
 });
+
+
 
 app.put('/user/:id', (req, res) => {
     const user = users.find(u => u.id === parseInt(req.params.id));
