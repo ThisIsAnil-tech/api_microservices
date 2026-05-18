@@ -1,0 +1,7 @@
+{
+    "service": {
+        "name": "web-service-2",
+        "tags": ["nodejs"],
+        "port": 3002
+    }
+}
