@@ -1,0 +1,16 @@
+{
+  "name": "exp9",
+  "version": "1.0.0",
+  "description": ">mkdir exp9\r >cd exp9\r >New-Item app.js \r >New-Item logstash.conf \r >New-Item docker-compose.yml\r >npm init -y\r >npm install express \r >npm install net",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1",
+    "net": "^1.0.2"
+  }
+}

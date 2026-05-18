@@ -1,0 +1,10 @@
+services:
+    user:
+        build: ./user
+        ports:
+            -"3002:3002"
+
+    prod:
+        build: ./prod
+        ports:
+            -"3001:3001"

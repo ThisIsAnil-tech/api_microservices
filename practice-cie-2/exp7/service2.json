@@ -1,0 +1,7 @@
+{
+    "service":{
+        "name":"web2",
+        "tags":[ "nodejs" ],
+        "port":4002
+    }
+}
