@@ -2,9 +2,11 @@ services:
   user-service:
     build: ./user-service
     ports:
-      - "3001:3001"
+      - "4000:3001"
 
   product-service:
     build: ./product-service
     ports:
-      - "3002:3002"
+      - "4001:3002"
+
+

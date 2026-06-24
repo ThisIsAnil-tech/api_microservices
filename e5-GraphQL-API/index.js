@@ -41,7 +41,7 @@ const root = {
         books.push(newBook);
         return newBook;
     }
-};m
+};
 
 app.use("/graphql", graphqlHTTP({
     schema: schema,

@@ -7,6 +7,7 @@
 >npm install express 
 >npm install net
 
+>docker-compose up --build
 >node app.js
 
 # open localhost:5601

@@ -1,159 +1,93 @@
-/* 
-const express = require("express");
-const connectDB = require("./config/db");
-const app = express();
+const express = require('express');
+const mongoose = require('mongoose');
 
+const app = express();
 app.use(express.json());
+
+const connectDB = async () => {
+    const mongodb_uri = "mongodb://localhost:27017/product";
+    try {
+        await mongoose.connect(mongodb_uri);
+        console.log("MongoDB connected Successfully.");
+    } catch (err) {
+        console.error("Error in connecting Mongodb: " + err.message);
+    }
+};
 
 connectDB();
 
-const productRoutes = require("./routes/ProductRoutes");
-app.use("/products", productRoutes);
-
-app.use((req, res) => {
-    res.status(404).json({ msg: "Route" });
+const prodSchema = new mongoose.Schema({
+    Pid: Number,
+    name: String,
+    price: Number
 });
 
-app.listen(8000, () => {
-    console.log("server running");
-});
+const Prod = mongoose.model("Product", prodSchema);
 
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-
-
-const app = express();
-
-// Middleware
-app.use(express.json());
-app.use(cors());
-
-// MongoDB Connection
-const url = 'mongodb://localhost:27017/prod';
-mongoose.connect(url)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
-
-
-const connect = async () => {
-  try {
-    await mongoose.connect(url);
-  } catch (err) {
-    console.error("MongoDB connection error:", err);
-    process.exit(1);
-  } 
-};
-
-connect();
-
-// Schema & Model
-const userSchema = new mongoose.Schema({
-  id: Number,
-  name: String,
-  email: String
-});
-
-const User = mongoose.model("User", userSchema);
-
-// Routes
-
-// Test route
 app.get("/", (req, res) => {
-  res.send("API Running...");
+    res.send("API Working...");
 });
 
-// CREATE
-app.post("/api/users",  (req, res) => {
-  try {
-    const user = new User(req.body)
-    .then( user.save())
-    .then(() => res.json(user))
-    .catch(err => res.status(500).json({ error: err.message })  );
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// READ ALL
-app.get("/api/users", async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// READ ONE
-app.get("/api/users/:id", async (req, res) => {
-  try {
-    const users = await User.find();
-    const user = users.find(u => u.id === parseInt(req.params.id));
-    if (!user) {
-      return res.status(404).json({ msg: "User not found" });
+app.get("/prod", async (req, res) => {
+    try {
+        const prods = await Prod.find();
+        res.status(200).json(prods);
+    } catch (err) {
+        res.status(400).json({ "Error": err.message });
     }
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 });
 
-
-
-
-// UPDATE
-app.put("/api/users/:id", async (req, res) => {
-  try {
-    const user = await User.findOneAndUpdate({ id: req.params.id }, req.body, { new: true });
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+app.get("/prods/:Pid", async (req, res) => {
+    try {
+        const prod = await Prod.findOne({ Pid: req.params.Pid });
+        if (!prod) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        res.status(200).json(prod);
+    } catch (err) {
+        res.status(400).json({ "Error": err.message });
+    }
 });
 
-// DELETE
-app.delete("/api/users/:id", async (req, res) => {
-  try {
-    await User.findOneAndDelete({ id: req.params.id });
-    res.json({ msg: "User deleted" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+app.post("/new/add", async (req, res) => {
+    try {
+        const prod = new Prod(req.body);
+        await prod.save();
+        res.status(201).json({ ...prod._doc, msg: "Product Added" });
+    } catch (err) {
+        res.status(400).json({ Error: err.message });
+    }
 });
 
-// Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.put("/old/add/:Pid", async (req, res) => {
+    try {
+        const prods = await Prod.findOneAndUpdate(
+            { Pid: req.params.Pid },
+            req.body,
+            { new: true }
+        );
+        if (!prods) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        res.status(200).json({ ...prods._doc, msg: "Product Updated" });
+    } catch (err) {
+        res.status(400).json({ "Error": err.message });
+    }
+});
+
+app.delete("/old/delete/:Pid", async (req, res) => {
+    try {
+        const prods = await Prod.findOneAndDelete({ Pid: req.params.Pid });
+        if (!prods) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        res.status(200).json({ Pid: req.params.Pid, msg: "Product Deleted" });
+    } catch (err) {
+        res.status(400).json({ "Error": err.message });
+    }
+});
+
+const port = 6985;
+app.listen(port, () => {
+    console.log(`Server Running on the port ${port}`);
+});
