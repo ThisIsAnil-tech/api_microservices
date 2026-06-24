@@ -1,0 +1,9 @@
+services :
+  user-details :
+    builds : ./user-service 
+    port: 
+      - "4001:40001"
+  order-details:
+    builds : ./order-services
+    port:
+      - "4002:4002"
